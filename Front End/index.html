@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Lunar Horizon Mapper</title>
+<script src="https://cdn.tailwindcss.com"></script>
+
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
+<!-- Three.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/three@0.152.2/build/three.min.js"></script>
+
+<style>
+canvas {
+  display: block;
+}
+</style>
+</head>
+
+<body class="bg-[#0b0f19] text-white font-['Inter'] overflow-x-hidden">
+
+<!-- NAVBAR -->
+<nav class="bg-[#0b0f19] text-white px-6 py-4 flex justify-between items-center border-b border-gray-800">
+  <div class="flex items-center gap-3">
+    <div class="w-8 h-8 bg-blue-400 rounded-full"></div>
+    <h1 class="font-['Orbitron'] text-lg">Lunar Horizon Mapper</h1>
+  </div>
+
+  <ul class="flex gap-6 text-gray-300">
+    <li><a href="index.html" class="text-blue-400">Home</a></li>
+    <li><a href="calculator.html" class="hover:text-blue-400">Calculator</a></li>
+    <li><a href="rover.html" class="hover:text-blue-400">Rover</a></li>
+    <li><a href="about.html" class="hover:text-blue-400">About</a></li>
+  </ul>
+</nav>
+
+<!-- HERO SECTION -->
+<section class="relative min-h-screen flex items-center justify-center px-6">
+
+  <div class="absolute inset-0 bg-gradient-to-b from-[#0b0f19] via-[#111827] to-[#0b0f19]"></div>
+
+  <div class="relative z-10 max-w-6xl w-full grid md:grid-cols-2 gap-10 items-center">
+
+    <!-- Left Text -->
+    <div>
+      <h2 class="font-['Orbitron'] text-4xl md:text-5xl mb-4">
+        Map Sunlight on the Moon
+      </h2>
+
+      <p class="text-gray-400 text-lg mb-6">
+        Terrain-aware solar exposure analysis for lunar mission planning,
+        power generation, and rover operations.
+      </p>
+
+      <a href="calculator.html"
+         class="inline-block bg-blue-400 text-black px-6 py-3 rounded-lg font-semibold hover:bg-blue-300 transition shadow-lg shadow-blue-400/30">
+        Start Mapping
+      </a>
+
+      <div class="mt-8 flex gap-4">
+        <div class="bg-[#111827] px-4 py-3 rounded-lg border border-gray-800">
+          <p class="text-sm text-gray-400">Terrain-aware</p>
+          <p class="font-semibold text-blue-400">Horizon Modeling</p>
+        </div>
+
+        <div class="bg-[#111827] px-4 py-3 rounded-lg border border-gray-800">
+          <p class="text-sm text-gray-400">Accurate</p>
+          <p class="font-semibold text-blue-400">Sun Geometry</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Right 3D Moon -->
+    <div class="relative flex justify-center items-center h-[500px]">
+      <div class="absolute bottom-0 w-full h-20 bg-[#111827] rounded-t-full"></div>
+      <div id="moonContainer" class="w-[400px] h-[400px]"></div>
+    </div>
+
+  </div>
+</section>
+
+<!-- FEATURES -->
+<section class="bg-[#111827] py-16 px-6">
+  <div class="max-w-6xl mx-auto grid md:grid-cols-3 gap-8 text-center">
+
+    <div class="bg-[#0b0f19] p-6 rounded-xl border border-gray-800">
+      <h3 class="font-['Orbitron'] mb-2 text-lg">Solar Exposure</h3>
+      <p class="text-gray-400 text-sm">
+        Compute total sunlight hours for any lunar location.
+      </p>
+    </div>
+
+    <div class="bg-[#0b0f19] p-6 rounded-xl border border-gray-800">
+      <h3 class="font-['Orbitron'] mb-2 text-lg">Terrain Modeling</h3>
+      <p class="text-gray-400 text-sm">
+        Visualize horizon obstructions from craters and ridges.
+      </p>
+    </div>
+
+    <div class="bg-[#0b0f19] p-6 rounded-xl border border-gray-800">
+      <h3 class="font-['Orbitron'] mb-2 text-lg">Rover Planning</h3>
+      <p class="text-gray-400 text-sm">
+        Estimate charging time for solar-powered rovers.
+      </p>
+    </div>
+
+  </div>
+</section>
+
+<footer class="text-center text-gray-500 text-sm py-6">
+  © 2026 Lunar Horizon Mapper — Front-end Prototype
+</footer>
+
+<!-- THREE.JS -->
+<script>
+const container = document.getElementById("moonContainer");
+
+// Scene
+const scene = new THREE.Scene();
+
+// Camera
+const camera = new THREE.PerspectiveCamera(45, 1, 0.1, 1000);
+camera.position.z = 6;
+
+// Renderer
+const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+renderer.setSize(400, 400);
+container.appendChild(renderer.domElement);
+
+// Load seamless moon texture
+const textureLoader = new THREE.TextureLoader();
+const moonTexture = textureLoader.load(
+  "https://raw.githubusercontent.com/mrdoob/three.js/dev/examples/textures/planets/moon_1024.jpg"
+);
+
+// 3D Sphere
+const geometry = new THREE.SphereGeometry(2, 64, 64);
+const material = new THREE.MeshBasicMaterial({ map: moonTexture });
+const moon = new THREE.Mesh(geometry, material);
+scene.add(moon);
+
+// Start above view
+moon.position.y = 5;
+let landed = false;
+
+function animate() {
+  requestAnimationFrame(animate);
+
+  // Rotation
+  moon.rotation.y += 0.003;
+
+  // Drop animation
+  if (!landed) {
+    moon.position.y -= 0.05;
+    if (moon.position.y <= 0) {
+      moon.position.y = 0;
+      landed = true;
+    }
+  }
+
+  renderer.render(scene, camera);
+}
+
+animate();
+</script>
+
+</body>
+</html>
