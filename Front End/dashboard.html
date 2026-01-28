@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Mission Dashboard</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500&family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+.moon-map-bg {
+  background-image: url("moon_map.png");
+  background-size: cover;
+  background-position: center;
+  position: relative;
+}
+
+.moon-map-bg::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(11,15,25,0.85);
+  backdrop-filter: blur(2px);
+}
+
+.card-stat {
+  background: linear-gradient(135deg, #0b0f19 0%, #111827 100%);
+}
+
+.stat-value {
+  font-size: 2rem;
+  font-weight: bold;
+  color: #60a5fa;
+}
+
+.stat-label {
+  font-size: 0.875rem;
+  color: #9ca3af;
+  text-transform: uppercase;
+}
+</style>
+</head>
+
+<body class="bg-[#0b0f19] text-white font-['Inter']">
+
+<!-- NAVBAR -->
+<nav class="bg-[#0b0f19] text-white px-6 py-4 flex justify-between items-center border-b border-gray-800">
+  <div class="flex items-center gap-3">
+    <div class="w-8 h-8 bg-blue-400 rounded-full"></div>
+    <h1 class="font-['Orbitron'] text-lg">Lunar Horizon Mapper</h1>
+  </div>
+
+  <ul class="flex gap-6 text-gray-300">
+    <li><a href="index.html" class="hover:text-blue-400">Home</a></li>
+    <li><a href="calculator.html" class="hover:text-blue-400">Calculator</a></li>
+    <li><a href="rover.html" class="hover:text-blue-400">Rover</a></li>
+    <li><a href="dashboard.html" class="text-blue-400">Dashboard</a></li>
+    <li><a href="about.html" class="hover:text-blue-400">About</a></li>
+  </ul>
+</nav>
+
+<!-- HEADER BANNER -->
+<section class="moon-map-bg py-16 px-6">
+  <div class="relative z-10 max-w-6xl mx-auto text-center">
+    <h2 class="font-['Orbitron'] text-4xl mb-3">
+      Mission Planning Dashboard
+    </h2>
+    <p class="text-gray-300">
+      Integrated lunar mission planning with solar analysis and rover battery calculations
+    </p>
+  </div>
+</section>
+
+<!-- MAIN CONTENT -->
+<section class="max-w-6xl mx-auto mt-10 px-6">
+
+  <!-- MISSION PARAMETERS CARD -->
+  <div class="bg-[#111827] p-8 rounded-xl shadow-lg border border-gray-800 mb-10">
+    <h3 class="font-['Orbitron'] text-2xl mb-6">Mission Parameters</h3>
+    
+    <div class="grid md:grid-cols-2 gap-6 mb-6">
+      <div>
+        <label class="block text-gray-400 text-sm mb-2">Location Latitude</label>
+        <input id="latitude" type="number" placeholder="-89 to 89" step="0.1" class="w-full bg-[#0b0f19] p-3 rounded text-white border border-gray-700">
+      </div>
+      <div>
+        <label class="block text-gray-400 text-sm mb-2">Location Longitude</label>
+        <input id="longitude" type="number" placeholder="-180 to 180" step="0.1" class="w-full bg-[#0b0f19] p-3 rounded text-white border border-gray-700">
+      </div>
+      <div>
+        <label class="block text-gray-400 text-sm mb-2">Start Date</label>
+        <input id="startDate" type="date" class="w-full bg-[#0b0f19] p-3 rounded text-white border border-gray-700">
+      </div>
+      <div>
+        <label class="block text-gray-400 text-sm mb-2">End Date</label>
+        <input id="endDate" type="date" class="w-full bg-[#0b0f19] p-3 rounded text-white border border-gray-700">
+      </div>
+    </div>
+
+    <button id="analyzeSolarBtn" class="w-full bg-blue-500 hover:bg-blue-600 text-black px-6 py-3 rounded font-semibold transition">
+      Analyze Solar Exposure
+    </button>
+  </div>
+
+  <!-- SOLAR RESULTS -->
+  <div id="solarSection" class="hidden mb-10">
+    <div class="grid md:grid-cols-3 gap-6 mb-10">
+      <div class="card-stat p-6 rounded-xl border border-gray-800">
+        <div class="stat-label mb-2">Total Sunlight Hours</div>
+        <div class="stat-value"><span id="solarHours">--</span> hrs</div>
+      </div>
+      <div class="card-stat p-6 rounded-xl border border-gray-800">
+        <div class="stat-label mb-2">Analysis Status</div>
+        <div class="stat-value text-green-400">✓ Complete</div>
+      </div>
+      <div class="card-stat p-6 rounded-xl border border-gray-800">
+        <div class="stat-label mb-2">Location</div>
+        <div class="text-sm"><span id="solarLocation">--</span></div>
+      </div>
+    </div>
+
+    <div class="bg-[#111827] p-6 rounded-xl border border-gray-800 mb-10">
+      <h3 class="font-['Orbitron'] text-xl mb-4">Terrain Horizon Profile</h3>
+      <div id="graphContainer" class="bg-[#0b0f19] rounded flex items-center justify-center min-h-[400px]">
+        <img id="graphImage" style="display:none; max-width:100%;" />
+        <span id="graphPlaceholder" class="text-gray-500">Graph will appear here</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ROVER BATTERY CALCULATOR -->
+  <div class="bg-[#111827] p-8 rounded-xl shadow-lg border border-gray-800 mb-10">
+    <h3 class="font-['Orbitron'] text-2xl mb-6">Rover Battery Configuration</h3>
+    
+    <div class="mb-6">
+      <h4 class="font-['Orbitron'] text-lg mb-4 text-blue-400">Solar Input</h4>
+      <div class="grid md:grid-cols-3 gap-4">
+        <div>
+          <label class="block text-gray-400 text-sm mb-2">Sunlight Hours (h)</label>
+          <input id="sunHours" type="number" step="0.1" placeholder="From solar analysis" class="w-full bg-[#0b0f19] p-3 rounded text-white border border-gray-700" value="10">
+        </div>
+        <div>
+          <label class="block text-gray-400 text-sm mb-2">Solar Panel Power (W)</label>
+          <input id="panelPower" type="number" step="0.1" class="w-full bg-[#0b0f19] p-3 rounded text-white border border-gray-700" value="120">
+        </div>
+        <div>
+          <label class="block text-gray-400 text-sm mb-2">Charging Efficiency (%)</label>
+          <input id="chargeEff" type="number" step="0.1" min="0" max="100" class="w-full bg-[#0b0f19] p-3 rounded text-white border border-gray-700" value="85">
+        </div>
+      </div>
+    </div>
+
+    <div class="mb-6">
+      <h4 class="font-['Orbitron'] text-lg mb-4 text-blue-400">Battery Properties</h4>
+      <div class="grid md:grid-cols-3 gap-4">
+        <div>
+          <label class="block text-gray-400 text-sm mb-2">Battery Capacity (Wh)</label>
+          <input id="batteryCapacity" type="number" step="0.1" class="w-full bg-[#0b0f19] p-3 rounded text-white border border-gray-700" value="2000">
+        </div>
+        <div>
+          <label class="block text-gray-400 text-sm mb-2">Initial State of Charge (%)</label>
+          <input id="initialSoc" type="number" step="0.1" min="0" max="100" class="w-full bg-[#0b0f19] p-3 rounded text-white border border-gray-700" value="30">
+        </div>
+        <div>
+          <label class="block text-gray-400 text-sm mb-2">System Load (W)</label>
+          <input id="loadPower" type="number" step="0.1" class="w-full bg-[#0b0f19] p-3 rounded text-white border border-gray-700" value="80">
+        </div>
+      </div>
+    </div>
+
+    <button id="calculateBatteryBtn" class="w-full bg-green-500 hover:bg-green-600 text-black px-6 py-3 rounded font-semibold transition">
+      Calculate Battery Performance
+    </button>
+  </div>
+
+  <!-- BATTERY RESULTS -->
+  <div id="batterySection" class="hidden mb-10">
+    <div class="grid md:grid-cols-3 gap-6 mb-10">
+      <div class="card-stat p-6 rounded-xl border border-gray-800">
+        <div class="stat-label mb-2">Operation Time Available</div>
+        <div class="stat-value text-green-400"><span id="operationHours">--</span> hrs</div>
+      </div>
+      <div class="card-stat p-6 rounded-xl border border-gray-800">
+        <div class="stat-label mb-2">Final Battery State</div>
+        <div class="stat-value"><span id="finalSoc">--</span>%</div>
+      </div>
+      <div class="card-stat p-6 rounded-xl border border-gray-800">
+        <div class="stat-label mb-2">Energy Generated</div>
+        <div class="stat-value"><span id="energyGenerated">--</span> Wh</div>
+      </div>
+    </div>
+
+    <div class="grid md:grid-cols-2 gap-6 mb-10">
+      <div class="bg-[#111827] p-6 rounded-xl border border-gray-800">
+        <h4 class="font-['Orbitron'] text-lg mb-4">Energy Flow</h4>
+        <div class="space-y-3">
+          <div class="flex justify-between">
+            <span class="text-gray-400">Initial Energy:</span>
+            <span class="text-blue-400"><span id="initialEnergy">--</span> Wh</span>
+          </div>
+          <div class="h-px bg-gray-700"></div>
+          <div class="flex justify-between">
+            <span class="text-gray-400">Generated:</span>
+            <span class="text-green-400">+<span id="genEnergy">--</span> Wh</span>
+          </div>
+          <div class="h-px bg-gray-700"></div>
+          <div class="flex justify-between text-lg font-semibold">
+            <span>Final Energy:</span>
+            <span class="text-blue-400"><span id="finalEnergy">--</span> Wh</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-[#111827] p-6 rounded-xl border border-gray-800">
+        <h4 class="font-['Orbitron'] text-lg mb-4">Mission Duration</h4>
+        <div class="space-y-3">
+          <div class="flex justify-between">
+            <span class="text-gray-400">Available Energy:</span>
+            <span class="text-blue-400"><span id="availableEnergy">--</span> Wh</span>
+          </div>
+          <div class="h-px bg-gray-700"></div>
+          <div class="flex justify-between">
+            <span class="text-gray-400">System Load:</span>
+            <span class="text-blue-400"><span id="displayLoadPower">--</span> W</span>
+          </div>
+          <div class="h-px bg-gray-700"></div>
+          <div class="flex justify-between text-lg font-semibold">
+            <span>Max Operation:</span>
+            <span class="text-green-400"><span id="opHours">--</span> hours</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MISSION SUMMARY -->
+  <div id="missionSummary" class="hidden">
+    <div class="bg-gradient-to-r from-blue-900 to-green-900 p-8 rounded-xl border border-blue-700 mb-10">
+      <h3 class="font-['Orbitron'] text-2xl mb-4">Mission Summary</h3>
+      <div class="grid md:grid-cols-2 gap-6">
+        <div>
+          <p class="text-gray-300 mb-4">
+            <strong>Location:</strong> <span id="summaryLocation">--</span>
+          </p>
+          <p class="text-gray-300 mb-4">
+            <strong>Analysis Period:</strong> <span id="summaryDates">--</span>
+          </p>
+          <p class="text-gray-300">
+            <strong>Expected Sunlight:</strong> <span class="text-yellow-300" id="summarySunlight">--</span> hours
+          </p>
+        </div>
+        <div>
+          <p class="text-gray-300 mb-4">
+            <strong>Rover Battery Capacity:</strong> <span id="summaryBattery">--</span> Wh
+          </p>
+          <p class="text-gray-300 mb-4">
+            <strong>Maximum Operation Time:</strong> <span class="text-green-300" id="summaryOp">--</span> hours
+          </p>
+          <p class="text-gray-300">
+            <strong>Mission Feasibility:</strong> <span id="summaryFeasible">✓ GO</span>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LOADING SPINNER -->
+  <div id="loadingSpinner" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+    <div class="text-center">
+      <div class="inline-block">
+        <div class="w-12 h-12 border-4 border-blue-400 border-t-blue-200 rounded-full animate-spin"></div>
+      </div>
+      <p class="text-gray-300 mt-4">Processing data...</p>
+    </div>
+  </div>
+
+</section>
+
+<!-- FOOTER -->
+<footer class="text-center text-gray-500 text-sm py-6 mt-16 border-t border-gray-800">
+  © 2026 Lunar Horizon Mapper — Mission Dashboard
+</footer>
+
+<script>
+// Auto-populate current date range (7 days)
+document.addEventListener('DOMContentLoaded', () => {
+  const today = new Date();
+  const sevenDaysLater = new Date(today.getTime() + 7 * 24 * 60 * 60 * 1000);
+  
+  document.getElementById('startDate').valueAsDate = today;
+  document.getElementById('endDate').valueAsDate = sevenDaysLater;
+});
+
+// Solar Analysis
+document.getElementById('analyzeSolarBtn').addEventListener('click', async () => {
+  const latitude = document.getElementById('latitude').value;
+  const longitude = document.getElementById('longitude').value;
+  const startDate = document.getElementById('startDate').value;
+  const endDate = document.getElementById('endDate').value;
+
+  if (!latitude || !longitude || !startDate || !endDate) {
+    alert('Please fill in all location and date fields');
+    return;
+  }
+
+  showLoadingSpinner();
+
+  try {
+    const response = await fetch('http://localhost:5000/analyze', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        latitude: parseFloat(latitude),
+        longitude: parseFloat(longitude),
+        startDate, endDate
+      })
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      document.getElementById('solarHours').textContent = data.sunlight_hours.toFixed(2);
+      document.getElementById('solarLocation').textContent = `${latitude}°, ${longitude}°`;
+      
+      if (data.graph_image) {
+        const img = document.getElementById('graphImage');
+        img.src = 'data:image/png;base64,' + data.graph_image;
+        img.style.display = 'block';
+        document.getElementById('graphPlaceholder').style.display = 'none';
+      }
+
+      // Auto-populate rover sunlight hours
+      document.getElementById('sunHours').value = data.sunlight_hours.toFixed(1);
+      
+      // Update summary
+      document.getElementById('summaryLocation').textContent = `${latitude}°, ${longitude}°`;
+      document.getElementById('summaryDates').textContent = `${startDate} to ${endDate}`;
+      document.getElementById('summarySunlight').textContent = data.sunlight_hours.toFixed(2);
+
+      document.getElementById('solarSection').classList.remove('hidden');
+    } else {
+      alert('Error: ' + (data.error || 'Unknown error'));
+    }
+  } catch (error) {
+    alert('Failed to connect: ' + error.message);
+  } finally {
+    hideLoadingSpinner();
+  }
+});
+
+// Battery Calculation
+document.getElementById('calculateBatteryBtn').addEventListener('click', async () => {
+  const sunHours = parseFloat(document.getElementById('sunHours').value);
+  const panelPower = parseFloat(document.getElementById('panelPower').value);
+  const chargeEff = parseFloat(document.getElementById('chargeEff').value);
+  const batteryCapacity = parseFloat(document.getElementById('batteryCapacity').value);
+  const initialSoc = parseFloat(document.getElementById('initialSoc').value);
+  const loadPower = parseFloat(document.getElementById('loadPower').value);
+
+  if (!sunHours || !panelPower || !chargeEff || !batteryCapacity || initialSoc === '' || !loadPower) {
+    alert('Please fill in all battery fields');
+    return;
+  }
+
+  showLoadingSpinner();
+
+  try {
+    const response = await fetch('http://localhost:5000/battery-calc', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        sun_hours: sunHours,
+        panel_power: panelPower,
+        charge_eff: chargeEff / 100,
+        battery_capacity: batteryCapacity,
+        initial_soc: initialSoc / 100,
+        load_power: loadPower
+      })
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      // Update results
+      document.getElementById('operationHours').textContent = data.operation_hours.toFixed(2);
+      document.getElementById('finalSoc').textContent = (data.final_soc * 100).toFixed(1);
+      document.getElementById('energyGenerated').textContent = data.energy_generated.toFixed(2);
+      document.getElementById('initialEnergy').textContent = data.initial_energy.toFixed(2);
+      document.getElementById('genEnergy').textContent = data.energy_generated.toFixed(2);
+      document.getElementById('finalEnergy').textContent = data.final_energy.toFixed(2);
+      document.getElementById('availableEnergy').textContent = data.final_energy.toFixed(2);
+      document.getElementById('displayLoadPower').textContent = data.load_power.toFixed(1);
+      document.getElementById('opHours').textContent = data.operation_hours.toFixed(2);
+
+      // Update mission summary
+      document.getElementById('summaryBattery').textContent = batteryCapacity.toFixed(0);
+      document.getElementById('summaryOp').textContent = data.operation_hours.toFixed(2);
+
+      const isFeasible = data.operation_hours >= 8 ? '✓ GO' : '⚠ CHECK';
+      document.getElementById('summaryFeasible').textContent = isFeasible;
+      document.getElementById('summaryFeasible').className = data.operation_hours >= 8 ? 'text-green-300' : 'text-yellow-300';
+
+      document.getElementById('batterySection').classList.remove('hidden');
+      document.getElementById('missionSummary').classList.remove('hidden');
+    } else {
+      alert('Error: ' + (data.error || 'Unknown error'));
+    }
+  } catch (error) {
+    alert('Failed to connect: ' + error.message);
+  } finally {
+    hideLoadingSpinner();
+  }
+});
+
+function showLoadingSpinner() {
+  document.getElementById('loadingSpinner').classList.remove('hidden');
+}
+
+function hideLoadingSpinner() {
+  document.getElementById('loadingSpinner').classList.add('hidden');
+}
+</script>
+
+</body>
+</html>

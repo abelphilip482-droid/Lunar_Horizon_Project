@@ -1,4 +1,0 @@
-Placeholder file to keep the Backend directory under version control.
-
-Git does not track empty directories. This file ensures the Backend folder
-remains part of the repository until backend services and APIs are implemented.

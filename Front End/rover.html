@@ -53,20 +53,175 @@
   </div>
 </section>
 
-<!-- ROVER CARD -->
-<section class="max-w-3xl mx-auto mt-10 bg-[#111827] p-8 rounded-xl shadow-lg border border-gray-800 relative z-10">
+<!-- ROVER BATTERY CHARGING ESTIMATOR -->
+<section class="max-w-4xl mx-auto mt-10 bg-[#111827] p-8 rounded-xl shadow-lg border border-gray-800 relative z-10">
+  <h3 class="font-['Orbitron'] text-2xl mb-6">Battery Charging Model</h3>
 
-  <input placeholder="Battery Capacity (Wh)" class="bg-[#0b0f19] p-3 rounded text-white w-full mb-4">
-  <input placeholder="Solar Panel Power (W)" class="bg-[#0b0f19] p-3 rounded text-white w-full mb-4">
-
-  <button class="bg-blue-400 text-black px-6 py-3 rounded font-semibold hover:bg-blue-300">
-    Estimate Charging Time
-  </button>
-
-  <div class="mt-6 text-gray-300">
-    Estimated Charging Time: <span class="text-blue-400 font-bold">-- hours</span>
+  <!-- Solar Configuration -->
+  <div class="bg-[#0b0f19] p-6 rounded-lg mb-6 border border-gray-700">
+    <h4 class="text-blue-400 font-bold mb-4">Solar Panel Configuration</h4>
+    <div class="grid grid-cols-2 gap-4">
+      <div>
+        <label class="text-gray-300 text-sm">Sunlight Hours (h)</label>
+        <input id="sun_hours" type="number" placeholder="e.g., 18.0" value="18.0"
+               class="bg-[#1f2937] p-3 rounded text-white w-full mt-2" step="0.1">
+      </div>
+      <div>
+        <label class="text-gray-300 text-sm">Panel Power (W)</label>
+        <input id="panel_power" type="number" placeholder="e.g., 120" value="120"
+               class="bg-[#1f2937] p-3 rounded text-white w-full mt-2" step="1">
+      </div>
+      <div>
+        <label class="text-gray-300 text-sm">Charging Efficiency (%)</label>
+        <input id="charge_eff" type="number" placeholder="e.g., 85" value="85"
+               class="bg-[#1f2937] p-3 rounded text-white w-full mt-2" step="1" min="0" max="100">
+      </div>
+    </div>
   </div>
+
+  <!-- Battery Configuration -->
+  <div class="bg-[#0b0f19] p-6 rounded-lg mb-6 border border-gray-700">
+    <h4 class="text-green-400 font-bold mb-4">Battery Configuration</h4>
+    <div class="grid grid-cols-2 gap-4">
+      <div>
+        <label class="text-gray-300 text-sm">Battery Capacity (Wh)</label>
+        <input id="battery_capacity" type="number" placeholder="e.g., 2000" value="2000"
+               class="bg-[#1f2937] p-3 rounded text-white w-full mt-2" step="100">
+      </div>
+      <div>
+        <label class="text-gray-300 text-sm">Initial SOC (%)</label>
+        <input id="initial_soc" type="number" placeholder="e.g., 30" value="30"
+               class="bg-[#1f2937] p-3 rounded text-white w-full mt-2" step="1" min="0" max="100">
+      </div>
+    </div>
+  </div>
+
+  <!-- Load Configuration -->
+  <div class="bg-[#0b0f19] p-6 rounded-lg mb-6 border border-gray-700">
+    <h4 class="text-orange-400 font-bold mb-4">System Load</h4>
+    <div class="grid grid-cols-1 gap-4">
+      <div>
+        <label class="text-gray-300 text-sm">Average System Load (W)</label>
+        <input id="load_power" type="number" placeholder="e.g., 80" value="80"
+               class="bg-[#1f2937] p-3 rounded text-white w-full mt-2" step="1">
+      </div>
+    </div>
+  </div>
+
+  <!-- Calculate Button -->
+  <button id="roverCalcBtn" type="button"
+          class="w-full bg-blue-400 text-black px-6 py-3 rounded font-semibold hover:bg-blue-300 mb-4">
+    Calculate Battery Performance
+  </button>
+  <span id="rover_status" class="text-gray-400 text-sm"></span>
+
 </section>
+
+<!-- RESULTS SECTION -->
+<section class="max-w-4xl mx-auto mt-10 space-y-6 mb-10">
+
+  <div class="bg-[#111827] p-6 rounded-xl border border-gray-800">
+    <h3 class="font-['Orbitron'] text-xl mb-4">Energy Performance</h3>
+    <div class="grid grid-cols-2 gap-6">
+      <div>
+        <p class="text-gray-400 text-sm mb-2">Energy Generated</p>
+        <p class="text-yellow-400 text-2xl font-bold"><span id="energy_generated">--</span> Wh</p>
+      </div>
+      <div>
+        <p class="text-gray-400 text-sm mb-2">Initial Battery SOC</p>
+        <p class="text-cyan-400 text-2xl font-bold"><span id="initial_energy_pct">--</span> %</p>
+      </div>
+      <div>
+        <p class="text-gray-400 text-sm mb-2">Final Battery SOC</p>
+        <p class="text-green-400 text-2xl font-bold"><span id="final_soc_pct">--</span> %</p>
+      </div>
+      <div>
+        <p class="text-gray-400 text-sm mb-2">Operation Time</p>
+        <p class="text-orange-400 text-2xl font-bold"><span id="operation_hours">--</span> h</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="bg-[#111827] p-6 rounded-xl border border-gray-800">
+    <h3 class="font-['Orbitron'] text-xl mb-4">Battery Status Details</h3>
+    <div class="space-y-3">
+      <p class="text-gray-300"><span class="text-gray-500">Sunlight Hours:</span> <span id="detail_sun_hours" class="text-blue-400">--</span> h</p>
+      <p class="text-gray-300"><span class="text-gray-500">Panel Power:</span> <span id="detail_panel_power" class="text-blue-400">--</span> W</p>
+      <p class="text-gray-300"><span class="text-gray-500">Charging Efficiency:</span> <span id="detail_charge_eff" class="text-blue-400">--</span> %</p>
+      <p class="text-gray-300"><span class="text-gray-500">Battery Capacity:</span> <span id="detail_battery_cap" class="text-green-400">--</span> Wh</p>
+      <p class="text-gray-300"><span class="text-gray-500">System Load:</span> <span id="detail_load_power" class="text-orange-400">--</span> W</p>
+    </div>
+  </div>
+
+</section>
+</section>
+
+<script>
+document.getElementById('roverCalcBtn').addEventListener('click', function() {
+  const sun_hours = parseFloat(document.getElementById('sun_hours').value);
+  const panel_power = parseFloat(document.getElementById('panel_power').value);
+  const charge_eff = parseFloat(document.getElementById('charge_eff').value) / 100;
+  const battery_capacity = parseFloat(document.getElementById('battery_capacity').value);
+  const initial_soc = parseFloat(document.getElementById('initial_soc').value) / 100;
+  const load_power = parseFloat(document.getElementById('load_power').value);
+  
+  const status = document.getElementById('rover_status');
+
+  // Validate inputs
+  if (!sun_hours || !panel_power || !charge_eff || !battery_capacity || !initial_soc || !load_power) {
+    status.textContent = 'Please fill in all fields';
+    status.style.color = '#ef4444';
+    return;
+  }
+
+  // Calculate battery performance
+  try {
+    // Energy generated by solar panels
+    const energy_generated = sun_hours * panel_power * charge_eff;
+    
+    // Initial battery energy
+    const initial_energy = initial_soc * battery_capacity;
+    
+    // Final battery energy (capped at capacity)
+    const final_energy = Math.min(battery_capacity, initial_energy + energy_generated);
+    
+    // Final SOC
+    const final_soc = final_energy / battery_capacity;
+    
+    // Operation time from battery
+    const operation_hours = final_energy / load_power;
+    
+    // Update results
+    document.getElementById('energy_generated').textContent = energy_generated.toFixed(2);
+    document.getElementById('initial_energy_pct').textContent = (initial_soc * 100).toFixed(1);
+    document.getElementById('final_soc_pct').textContent = (final_soc * 100).toFixed(1);
+    document.getElementById('operation_hours').textContent = operation_hours.toFixed(2);
+    
+    // Update details
+    document.getElementById('detail_sun_hours').textContent = sun_hours.toFixed(2);
+    document.getElementById('detail_panel_power').textContent = panel_power.toFixed(0);
+    document.getElementById('detail_charge_eff').textContent = (charge_eff * 100).toFixed(1);
+    document.getElementById('detail_battery_cap').textContent = battery_capacity.toFixed(0);
+    document.getElementById('detail_load_power').textContent = load_power.toFixed(0);
+    
+    status.textContent = 'Calculation complete!';
+    status.style.color = '#10b981';
+  } catch (error) {
+    status.textContent = 'Error: ' + error.message;
+    status.style.color = '#ef4444';
+  }
+});
+</script>
+
+<script>
+// Load sunlight hours from calculator if available
+window.addEventListener('DOMContentLoaded', function() {
+  const storedSunlightHours = localStorage.getItem('lunarSunlightHours');
+  if (storedSunlightHours) {
+    document.getElementById('sun_hours').value = storedSunlightHours;
+  }
+});
+</script>
 
 </body>
 </html>
