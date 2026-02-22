@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About - Lunar Horizon Mapper</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700&family=Inter:wght@300;400;600&display=swap"
+    rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+
+<body class="bg-[#0b0f19] text-white font-['Inter'] selection:bg-blue-500 selection:text-white">
+
+  <!-- Background Effects -->
+  <div class="fixed inset-0 pointer-events-none z-0">
+    <div class="absolute inset-0 bg-gradient-to-b from-[#0b0f19] via-[#0f1525] to-[#0b0f19]"></div>
+    <div class="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] bg-purple-500/10 rounded-full blur-[120px]"></div>
+    <div class="absolute bottom-[-20%] right-[-10%] w-[600px] h-[600px] bg-blue-500/10 rounded-full blur-[120px]"></div>
+  </div>
+
+  <app-navbar active="about"></app-navbar>
+
+  <main class="relative z-10 container mx-auto px-6 py-12 min-h-[80vh]">
+    <div class="max-w-3xl mx-auto glass-panel p-10 rounded-2xl reveal-on-scroll">
+      <h2 class="font-['Orbitron'] text-3xl font-bold mb-6 text-blue-400">About This Project</h2>
+
+      <div class="space-y-6 text-gray-300 leading-relaxed font-light text-lg">
+        <p>
+          Accurate estimation of solar exposure on the lunar surface is essential for mission planning,
+          power generation, and thermal management. The <span class="text-white font-semibold">Lunar Horizon
+            Mapper</span> solves this by providing a high-fidelity analysis tool.
+        </p>
+        <p>
+          This project presents a <span class="text-blue-200">terrain-aware solar exposure model</span> using
+          high-resolution lunar topographic data and precise Sun–Moon geometry calculations.
+        </p>
+
+        <div class="grid grid-cols-2 gap-4 mt-8">
+          <div class="bg-blue-500/5 border border-blue-500/10 p-4 rounded-lg">
+            <h4 class="font-['Orbitron'] text-white mb-1">Data Source</h4>
+            <p class="text-xs text-gray-400">LOLA (Lunar Orbiter Laser Altimeter)</p>
+          </div>
+          <div class="bg-cyan-500/5 border border-cyan-500/10 p-4 rounded-lg">
+            <h4 class="font-['Orbitron'] text-white mb-1">Precision</h4>
+            <p class="text-xs text-gray-400">High-resolution DEM modeling</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <app-footer></app-footer>
+
+  <script defer src="js/main.js"></script>
+</body>
+
+</html>
